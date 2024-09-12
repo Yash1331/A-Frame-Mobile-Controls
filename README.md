@@ -11,13 +11,12 @@ This A-Frame component provides a mobile-friendly interface for controlling move
 
 ## Installation
 
-1. Download the file and place it in the same directory as your HTML file.
-2. Include the `mobile-controls.js` script in your HTML file after the A-Frame library:
+1. Include the `mobile-controls.js` script in your HTML file after the A-Frame library:
 
 ```html
 <head>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="/mobile-controls.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/Yash1331/A-Frame-Mobile-Controls@main/mobile-controls.js"></script>
 </head>
 ```
 3. Add the mobile-controls component to your A-Frame scene:
