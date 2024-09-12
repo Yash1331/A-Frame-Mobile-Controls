@@ -19,7 +19,7 @@ This A-Frame component provides a mobile-friendly interface for controlling move
   <script src="https://cdn.jsdelivr.net/gh/Yash1331/A-Frame-Mobile-Controls@main/mobile-controls.js"></script>
 </head>
 ```
-3. Add the mobile-controls component to your A-Frame scene:
+2. Add the mobile-controls component to your A-Frame scene:
 ```
 <a-scene mobile-controls="moveSpeed: 1; lookSpeed: 0.01">
   <!-- Your A-Frame content -->
