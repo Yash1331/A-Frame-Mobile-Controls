@@ -5,11 +5,12 @@
  * 
  * Author: Yash1331
  * GitHub: https://github.com/Yash1331/A-Frame-Mobile-Controls
- * Version: 1.0.0
+ * Version: 1.1.0
  * Last Updated: 12/09/2024
  * 
  * Revision History:
- * - 1.0.0: Initial release with basic joystick controls.
+ * - 1.0.0: Initial release with basic move joystick & click button controls.
+ * - 1.1.0: Added joystick controls for move and look.
  *
  * Usage:
  * To use this component, include it in your A-Frame scene as follows:
