@@ -22,6 +22,8 @@ This A-Frame component provides a mobile-friendly interface for controlling move
 2. Add the mobile-controls component to your A-Frame scene:
 ```
 <a-scene mobile-controls="moveSpeed: 1; lookSpeed: 0.01">
+
   <!-- Your A-Frame content -->
+
 </a-scene>
 ```
