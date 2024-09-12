@@ -20,78 +20,76 @@
 
 AFRAME.registerComponent('mobile-controls', {
   init: function () {
-    if (!AFRAME.utils.device.isMobile()) return; 
-    this.joystickEl = null;
-    this.joystickBG = null;
-    this.joystickHandle = null;
-    this.tapButton = null;
+    if (!AFRAME.utils.device.isMobile()) return; // Only run on mobile devices
+
+    this.moveJoystickEl = null;
+    this.lookJoystickEl = null;
     this.camera = document.querySelector('[camera]');
     this.createUI();
     this.addEventListeners();
+    this.disableDefaultControls();
   },
 
   createUI: function () {
-    // Creating joystick container
-    this.joystickEl = document.createElement('div');
-    this.joystickEl.style.position = 'fixed';
-    this.joystickEl.style.bottom = '20px';
-    this.joystickEl.style.left = '20px';
-    this.joystickEl.style.width = '100px';
-    this.joystickEl.style.height = '100px';
-    this.joystickEl.style.zIndex = '9999';
+    // Create move joystick
+    this.moveJoystickEl = this.createJoystick('20px', '20px');
 
-    // Creating joystick background
-    this.joystickBG = document.createElement('div');
-    this.joystickBG.style.position = 'absolute';
-    this.joystickBG.style.width = '100%';
-    this.joystickBG.style.height = '100%';
-    this.joystickBG.style.borderRadius = '50%';
-    this.joystickBG.style.background = 'rgba(255, 255, 255, 0.3)';
+    // Create look joystick
+    this.lookJoystickEl = this.createJoystick('20px', 'calc(50% - 50px)');
 
-    // Creating joystick handle
-    this.joystickHandle = document.createElement('div');
-    this.joystickHandle.style.position = 'absolute';
-    this.joystickHandle.style.width = '50%';
-    this.joystickHandle.style.height = '50%';
-    this.joystickHandle.style.borderRadius = '50%';
-    this.joystickHandle.style.background = 'rgba(255, 255, 255, 0.7)';
-    this.joystickHandle.style.left = '25%';
-    this.joystickHandle.style.top = '25%';
+    document.body.appendChild(this.moveJoystickEl);
+    document.body.appendChild(this.lookJoystickEl);
+  },
 
-    // Create tap button
-    this.tapButton = document.createElement('div');
-    this.tapButton.style.position = 'fixed';
-    this.tapButton.style.bottom = '20px';
-    this.tapButton.style.right = '20px';
-    this.tapButton.style.width = '60px';
-    this.tapButton.style.height = '60px';
-    this.tapButton.style.borderRadius = '50%';
-    this.tapButton.style.background = 'rgba(255, 255, 255, 0.5)';
-    this.tapButton.style.zIndex = '9999';
+  createJoystick: function (bottom, right) {
+    const joystickEl = document.createElement('div');
+    joystickEl.style.position = 'fixed';
+    joystickEl.style.bottom = bottom;
+    joystickEl.style.right = right;
+    joystickEl.style.width = '100px';
+    joystickEl.style.height = '100px';
+    joystickEl.style.zIndex = '9999';
 
-    // Appending elements to the DOM
-    this.joystickEl.appendChild(this.joystickBG);
-    this.joystickEl.appendChild(this.joystickHandle);
-    document.body.appendChild(this.joystickEl);
-    document.body.appendChild(this.tapButton);
+    const joystickBG = document.createElement('div');
+    joystickBG.style.position = 'absolute';
+    joystickBG.style.width = '100%';
+    joystickBG.style.height = '100%';
+    joystickBG.style.borderRadius = '50%';
+    joystickBG.style.background = 'rgba(255, 255, 255, 0.3)';
+
+    const joystickHandle = document.createElement('div');
+    joystickHandle.style.position = 'absolute';
+    joystickHandle.style.width = '50%';
+    joystickHandle.style.height = '50%';
+    joystickHandle.style.borderRadius = '50%';
+    joystickHandle.style.background = 'rgba(255, 255, 255, 0.7)';
+    joystickHandle.style.left = '25%';
+    joystickHandle.style.top = '25%';
+
+    joystickEl.appendChild(joystickBG);
+    joystickEl.appendChild(joystickHandle);
+
+    return joystickEl;
   },
 
   addEventListeners: function () {
-    this.joystickEl.addEventListener('touchstart', this.onJoystickStart.bind(this));
-    this.joystickEl.addEventListener('touchmove', this.onJoystickMove.bind(this));
-    this.joystickEl.addEventListener('touchend', this.onJoystickEnd.bind(this));
-    this.tapButton.addEventListener('touchstart', this.onTapStart.bind(this));
-    this.tapButton.addEventListener('touchend', this.onTapEnd.bind(this));
+    this.moveJoystickEl.addEventListener('touchstart', this.onMoveJoystickStart.bind(this));
+    this.moveJoystickEl.addEventListener('touchmove', this.onMoveJoystickMove.bind(this));
+    this.moveJoystickEl.addEventListener('touchend', this.onMoveJoystickEnd.bind(this));
+
+    this.lookJoystickEl.addEventListener('touchstart', this.onLookJoystickStart.bind(this));
+    this.lookJoystickEl.addEventListener('touchmove', this.onLookJoystickMove.bind(this));
+    this.lookJoystickEl.addEventListener('touchend', this.onLookJoystickEnd.bind(this));
   },
 
-  onJoystickStart: function (event) {
+  onMoveJoystickStart: function (event) {
     event.preventDefault();
   },
 
-  onJoystickMove: function (event) {
+  onMoveJoystickMove: function (event) {
     event.preventDefault();
     const touch = event.touches[0];
-    const rect = this.joystickEl.getBoundingClientRect();
+    const rect = this.moveJoystickEl.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const deltaX = touch.clientX - centerX;
@@ -102,45 +100,68 @@ AFRAME.registerComponent('mobile-controls', {
     const moveX = Math.cos(angle) * distance;
     const moveY = Math.sin(angle) * distance;
 
-    this.joystickHandle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    this.moveJoystickEl.querySelector('div:nth-child(2)').style.transform = `translate(${moveX}px, ${moveY}px)`;
 
     // Emulate WASD keys based on joystick position
-    const keyEvent = new KeyboardEvent('keydown', { bubbles: true });
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 0) {
-        keyEvent.key = 'd';
-      } else {
-        keyEvent.key = 'a';
-      }
-    } else {
-      if (deltaY > 0) {
-        keyEvent.key = 's';
-      } else {
-        keyEvent.key = 'w';
-      }
-    }
+    const threshold = 10;
+    if (deltaX < -threshold) this.emulateKeyPress('a');
+    if (deltaX > threshold) this.emulateKeyPress('d');
+    if (deltaY < -threshold) this.emulateKeyPress('w');
+    if (deltaY > threshold) this.emulateKeyPress('s');
+  },
+
+  onMoveJoystickEnd: function (event) {
+    event.preventDefault();
+    this.moveJoystickEl.querySelector('div:nth-child(2)').style.transform = 'translate(0, 0)';
+  },
+
+  onLookJoystickStart: function (event) {
+    event.preventDefault();
+  },
+
+  onLookJoystickMove: function (event) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    const rect = this.lookJoystickEl.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const deltaX = touch.clientX - centerX;
+    const deltaY = touch.clientY - centerY;
+
+    const angle = Math.atan2(deltaY, deltaX);
+    const distance = Math.min(rect.width / 2, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+    const moveX = Math.cos(angle) * distance;
+    const moveY = Math.sin(angle) * distance;
+
+    this.lookJoystickEl.querySelector('div:nth-child(2)').style.transform = `translate(${moveX}px, ${moveY}px)`;
+
+    // Emulate mouse movement for looking around
+    const lookSpeed = 0.1;
+    this.camera.object3D.rotation.y -= deltaX * lookSpeed * 0.01;
+    this.camera.object3D.rotation.x -= deltaY * lookSpeed * 0.01;
+    this.camera.object3D.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.camera.object3D.rotation.x));
+  },
+
+  onLookJoystickEnd: function (event) {
+    event.preventDefault();
+    this.lookJoystickEl.querySelector('div:nth-child(2)').style.transform = 'translate(0, 0)';
+  },
+
+  emulateKeyPress: function (key) {
+    const keyEvent = new KeyboardEvent('keydown', { bubbles: true, key: key });
     document.dispatchEvent(keyEvent);
   },
 
-  onJoystickEnd: function (event) {
-    event.preventDefault();
-    this.joystickHandle.style.transform = 'translate(0, 0)';
-    // Release all WASD keys
-    ['w', 'a', 's', 'd'].forEach(key => {
-      const keyEvent = new KeyboardEvent('keyup', { bubbles: true, key: key });
-      document.dispatchEvent(keyEvent);
-    });
-  },
+  disableDefaultControls: function () {
+    // Disable default look controls
+    const lookControls = this.camera.components['look-controls'];
+    if (lookControls) {
+      lookControls.pause();
+    }
 
-  onTapStart: function (event) {
-    event.preventDefault();
-    const mouseEvent = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
-    this.camera.dispatchEvent(mouseEvent);
-  },
-
-  onTapEnd: function (event) {
-    event.preventDefault();
-    const mouseEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window });
-    this.camera.dispatchEvent(mouseEvent);
+    // Prevent default touch behavior
+    document.body.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+    }, { passive: false });
   }
 });
